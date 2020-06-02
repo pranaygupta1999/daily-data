@@ -1,10 +1,12 @@
-from flask import Flask, request, send_file, redirect
+from flask import Flask, request, send_file, render_template
 import database
 
 dataUrl:str  = 'https://assignment-machstatz.herokuapp.com/excel'
 
 app = Flask(__name__)
-
+@app.route('/')
+def home():
+    return render_template("home.html")
 @app.route('/total')
 def getTotal():
     date_string = request.args.get("day")
@@ -15,7 +17,7 @@ def get_excel():
     try:
         return send_excel_file()
     except Exception as e:
-		return str(e)
+	    return str(e)
     
 
 
