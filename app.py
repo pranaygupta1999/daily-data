@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, render_template
+from flask import Flask, request, send_file, render_template, jsonify
 import database
 
 dataUrl:str  = 'https://assignment-machstatz.herokuapp.com/excel'
@@ -7,10 +7,15 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     return render_template("home.html")
+
 @app.route('/total')
 def getTotal():
-    date_string = request.args.get("day")
-    return database.read(date_string)
+    try:
+        date_string = request.args.get("day")
+        return database.read(date_string)
+    except Exception as e:
+	    return jsonify({"msg": "Invalid date provided", "err":str(e)})
+    
 
 @app.route('/excelreport/')
 def get_excel():
