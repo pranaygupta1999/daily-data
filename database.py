@@ -8,17 +8,21 @@ import requests
 import json
 import xlwt 
 from xlwt import Workbook, Worksheet, Style
+import os
 
 
 dataUrl:str  = 'https://assignment-machstatz.herokuapp.com/excel'
 database_file:str = './datafile.json'
 excel_file_name:str = "excel_data.xls"
+latestDataUpdate:date = date.today()
 date_format = "%d-%m-%Y"
+
 def load_data():
     r = requests.get(dataUrl)
     data = r.json()
     with open(database_file, 'w+') as f:
         json.dump(data, f, indent=4)
+    latestDataUpdate = date.today()
 
 
 
@@ -29,6 +33,9 @@ def _read_data_from_date(input_date:date)->json:
             "totalQuantity": 0
         }
     
+    if not os.path.isfile('./datafile.json'):
+        load_data()
+
     with open(database_file, 'r') as data_file :
         json_array:list = json.load(data_file)
         for item in json_array:
@@ -42,7 +49,7 @@ def _read_data_from_date(input_date:date)->json:
 
 def read(date_string:str)->json:
     input_date:date = datetime.strptime(date_string, date_format).date()
-    if input_date == date.today():
+    if input_date >= latestDataUpdate:
         print("Reloading the database")
         load_data()
         
